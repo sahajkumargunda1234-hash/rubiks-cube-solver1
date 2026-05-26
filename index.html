@@ -1,0 +1,208 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rubik's Cube Solver</title>
+  <script src="https://cdn.jsdelivr.net/npm/cubejs/lib/cube.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }body {
+  background: #0f172a;
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.container {
+  width: 100%;
+  max-width: 900px;
+  background: #1e293b;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #38bdf8;
+}
+
+.section {
+  margin-bottom: 30px;
+}
+
+label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+textarea {
+  width: 100%;
+  min-height: 120px;
+  border: none;
+  border-radius: 10px;
+  padding: 15px;
+  font-size: 16px;
+  background: #334155;
+  color: white;
+  resize: vertical;
+}
+
+button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #38bdf8;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #0ea5e9;
+}
+
+.output {
+  background: #334155;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 20px;
+  line-height: 2;
+}
+
+.step {
+  background: #475569;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.note {
+  background: #0f766e;
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.camera-box {
+  background: #334155;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+video {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+@media(max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+}
+
+  </style>
+</head>
+<body>  <div class="container">
+    <h1>Rubik's Cube Solver</h1><div class="camera-box">
+  <h2>Cube Camera Scanner</h2>
+  <p>Allow camera access and show your Rubik's Cube.</p>
+  <video id="video" autoplay playsinline></video>
+  <br>
+  <button onclick="startCamera()">Start Camera</button>
+</div>
+
+<div class="section">
+  <label>Enter Cube State</label>
+  <textarea id="cubeInput">
+
+Example: UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB </textarea>
+
+<button onclick="solveCube()">Solve Cube</button>
+</div>
+
+<div class="output" id="output">
+  Solution steps will appear here...
+</div>
+
+<div class="note">
+  <strong>Cube Notation:</strong><br><br>
+  U = Up Face<br>
+  D = Down Face<br>
+  R = Right Face<br>
+  L = Left Face<br>
+  F = Front Face<br>
+  B = Back Face
+</div>
+
+  </div>  <script>
+    async function startCamera() {
+      const video = document.getElementById('video');
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true
+        });
+
+        video.srcObject = stream;
+      } catch (error) {
+        alert('Camera access denied or not available');
+      }
+    }
+
+    function solveCube() {
+      const output = document.getElementById('output');
+      const cubeState = document.getElementById('cubeInput').value.trim();
+
+      try {
+        Cube.initSolver();
+
+        const solution = Cube.fromString(cubeState).solve();
+
+        const moves = solution.split(' ');
+
+        let html = '<h2>Solution Steps</h2><br>';
+
+        moves.forEach((move, index) => {
+          html += `
+            <div class="step">
+              Step ${index + 1} → ${move}
+            </div>
+          `;
+        });
+
+        html += `
+          <br>
+          <h2 style="color:#22c55e;">
+            Cube Solved Successfully ✓
+          </h2>
+        `;
+
+        output.innerHTML = html;
+
+      } catch (error) {
+        output.innerHTML = `
+          <h2 style="color:red;">
+            Invalid Cube State!
+          </h2>
+          <p>Please enter a valid Rubik's cube state.</p>
+        `;
+      }
+    }
+  </script></body>
+</html>
